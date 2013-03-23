@@ -1,0 +1,389 @@
+<?php
+/**
+ * @file
+ * Implements IPVenger in Drupal.
+ */
+
+use IPVenger\CMS\IPVengerDrupalAppeal;
+use IPVenger\CMS\IPVengerDrupalCache;
+use IPVenger\Securimage\IPVengerSecurimage;
+use IPVenger\Service\IPVengerSettings;
+use IPVenger\Service\IPVengerServiceFactory;
+use IPVenger\Service\IPVengerServiceData;
+
+/**
+ * Implements hook_menu().
+ */
+function ipvenger_menu() {
+  $items['admin/config/security'] = array(
+    'title' => 'Security',
+    'description' => 'Security tools.',
+    'position' => 'left',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  $items['admin/config/security/ipvenger'] = array(
+    'title' => 'IPVenger Settings',
+    'description' => 'Configure settings for IPVenger.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ipvenger_admin_settings'),
+    'access arguments' => array('administer ipvenger'),
+    'file' => 'ipvenger.admin.inc',
+  );
+  $items['admin/config/security/ipvenger/basic'] = array(
+    'title' => 'IPVenger Settings',
+    'description' => 'Configure settings for IPVenger.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ipvenger_admin_settings'),
+    'access arguments' => array('administer ipvenger'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'ipvenger.admin.inc',
+  );
+  $items['admin/config/security/ipvenger/advanced'] = array(
+    'title' => 'Advanced Settings',
+    'weight' => 10,
+    'description' => 'Administer advanced settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ipvenger_admin_advanced_settings'),
+    'access arguments' => array('administer ipvenger'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'ipvenger.admin.inc',
+  );
+  $items['admin/config/security/ipvenger/control-center'] = array(
+    'title' => 'Control Center',
+    'weight' => 20,
+    'description' => 'Administer blocked IP addresses.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ipvenger_admin_control_center'),
+    'access arguments' => array('administer ipvenger'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'ipvenger.admin.inc',
+  );
+  $items['admin/ipvenger/ip-history-lookup'] = array(
+    'title' => 'IP History Lookup',
+    'weight' => 20,
+    'description' => 'Retrieve most recent general information and also request history associated with the given IP.',
+    'page callback' => 'ipvenger_ip_history_lookup',
+    'page arguments' => array(3),
+    'access arguments' => array('administer ipvenger'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ipvenger.admin.inc',
+  );
+  $items['admin/ipvenger/mask-action'] = array(
+    'title' => 'Mask Actions',
+    'weight' => 20,
+    'description' => 'White or blacklist IP addresses & countries.',
+    'page callback' => 'ipvenger_mask_action',
+    'page arguments' => array(3, 4),
+    'access arguments' => array('administer ipvenger'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ipvenger.admin.inc',
+  );
+  $items['ipvenger/pages/block'] = array(
+    'title' => 'IPVenger Block',
+    'weight' => 20,
+    'description' => 'IPVenger block page',
+    'page callback' => 'ipvenger_block_page',
+    'access callback' => TRUE,
+    'file' => 'ipvenger.pages.inc',
+  );
+  $items['ipvenger/pages/captcha'] = array(
+    'title' => 'IPVenger Captcha Image',
+    'weight' => 20,
+    'description' => 'IPVenger captcha image',
+    'page callback' => 'ipvenger_captcha_image',
+    'access callback' => TRUE,
+    'file' => 'ipvenger.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_boot().
+ */
+function ipvenger_boot() {
+  if (!drupal_is_cli() || !function_exists('libraries_load')) {
+    // We need to fully bootstrap so we can use libraries.
+    drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL, FALSE);
+
+    $library = libraries_load('ipvenger');
+    if ($library['installed']) {
+      $ip_address = ip_address();
+      $settings = ipvenger_settings();
+
+      if (_ipvenger_allowed_paths($settings)) {
+        $service = IPVengerServiceFactory::get();
+        $data = $service->getRiskResponse($settings, new IPVengerDrupalCache(), $ip_address);
+        $disposition_reason = $data->getDispositionReason();
+        // Clear the valid api key on certain errors.
+        if ($disposition_reason == 'API Key error 400'
+            || $disposition_reason == 'API Key error 401'
+            || $disposition_reason == 'API Key error 402') {
+          variable_del('ipvenger_apikey_valid');
+        }
+        if ($disposition_reason != 'Session Allowed' || $disposition_reason != 'IP Whitelist') {
+          $blocked = $service->assessRiskResponse($data, $settings, new IPVengerDrupalAppeal());
+          _ipvenger_risk_response_insert($data);
+          if ($blocked) {
+            drupal_goto('ipvenger/pages/block',
+              array('query' => drupal_get_destination())
+            );
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function ipvenger_permission() {
+  return array(
+    'administer ipvenger' => array(
+      'title' => t('Administer IPVenger'),
+      'description' => t('Allow users to administer IPVenger settings.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_cron().
+ */
+function ipvenger_cron() {
+  // Delete all records older than 30 days (2592000 seconds).
+  $expires = REQUEST_TIME - 2592000;
+  db_delete('ipvenger_request_detail')
+    ->condition('timestamp', $expires, '<=')
+    ->execute();
+
+  // Delete all records older than 2 days (172800 seconds).
+  $expires = REQUEST_TIME - 172800;
+  db_delete('ipvenger_appeal')
+    ->condition('timestamp', $expires, '<=')
+    ->execute();
+
+  // Re-generate new captchas on each cron run.
+  $library = libraries_load('securimage');
+  if ($library['installed']) {
+    $secure_image = new IPVengerSecurimage();
+    $secure_image->initCaptchaCache();
+    $success = TRUE;
+  }
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function ipvenger_cron_queue_info() {
+  $queues = array();
+  $queues['ipvenger'] = array(
+    'worker callback' => 'ipvenger_cron_queue_worker_callback',
+    'time' => 120,
+  );
+  return $queues;
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function ipvenger_libraries_info() {
+  $libraries['ipvenger'] = array(
+    'name' => 'IPVenger',
+    'vendor url' => 'http://ipvenger.com/',
+    'download url' => 'http://ipvenger.com/download',
+    'version arguments' => array(
+      'file' => 'VERSION',
+      'pattern' => '@([0-9\.]+)@',
+      'lines' => 1,
+      'cols' => 6,
+    ),
+    'versions' => array(
+      '2.0.0' => array(
+        'files' => array(
+          'php' => array('IPVenger/Bootstrap/IPVenger_auto.php'),
+        ),
+      ),
+    ),
+  );
+  $libraries['securimage'] = array(
+    'name' => 'Securimage',
+    'vendor url' => 'http://www.phpcaptcha.org/',
+    'download url' => 'http://www.phpcaptcha.org/download/',
+    'version arguments' => array(
+      'file' => 'README.txt',
+      'pattern' => '@VERSION: ([0-9\.A-Za-z]+)@',
+      'lines' => 5,
+      'cols' => 200,
+    ),
+    'versions' => array(
+      '3.2RC2' => array(
+        'files' => array(
+          'php' => array('securimage.php'),
+        ),
+      ),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Helper function to store the ipvenger response.
+ *
+ * @param IPVengerServiceData $data
+ *   The data to store in the database.
+ */
+function _ipvenger_risk_response_insert(IPVengerServiceData $data) {
+  drupal_write_record('ipvenger_request_detail', $data->getData());
+}
+
+/**
+ * Implements hook_flush_caches().
+ */
+function ipvenger_flush_caches() {
+  // Do not actually flush caches if running on cron. Drupal uses this hook
+  // in an inconsistent fashion and it does not necessarily mean to *flush*
+  // caches when running from cron. Instead it's just getting a list of cache
+  // tables and may not do any flushing.
+  if (!empty($GLOBALS['locks']['cron'])) {
+    return;
+  }
+
+  return array('cache_ipvenger');
+}
+
+/**
+ * Worker callback for ipvenger_cron_queue_info().
+ *
+ * @param stdClass $item
+ *   Queue item.
+ *
+ * @return bool
+ *   Designates if a queue item was successfully processed.
+ */
+function ipvenger_cron_queue_worker_callback($item) {
+  $success = FALSE;
+
+  switch ($item->data) {
+    case 'generateCaptchas':
+      $success = _ipvenger_generate_captcha();
+      break;
+  }
+
+  return $success;
+}
+/**
+ * Initializes the generation of all new captchas.
+ *
+ * @return bool
+ *   Designates if new captchas were generated.
+ */
+function _ipvenger_generate_captcha() {
+  $success = FALSE;
+
+  $library = libraries_load('securimage');
+  if ($library['installed']) {
+    $secure_image = new IPVengerSecurimage();
+    $secure_image->initCaptchaCache();
+    $success = TRUE;
+  }
+
+  return $success;
+}
+
+/**
+ * Helper function to return a populated settings object.
+ */
+function ipvenger_settings() {
+  global $base_url;
+  $settings = &drupal_static(__FUNCTION__);
+
+  if (!isset($settings)) {
+    $settings = new IPVengerSettings();
+    $settings->setApiKey(variable_get('ipvenger_apikey', ''));
+    $settings->setRiskThreshold(variable_get('ipvenger_risk_threshold', 42));
+    $settings->setAllowAppeal(variable_get('ipvenger_appeal_allow', TRUE));
+    $settings->setAppealEmail(variable_get('ipvenger_appeal_email', ''));
+    $settings->setGeneralMessage(variable_get('ipvenger_general_msg', '<h1>Forbidden</h1><p>Your access to this website has been blocked because your IP address has been identified as a potential threat.  If you believe that this is an error, and wish to be allowed access, please contact the site administrator.</p>'));
+    $settings->setProxyMessage(variable_get('ipvenger_prox_msg', '<h1>Forbidden</h1><p>Your access to this website has been blocked because you are accessing the Internet through a Proxy that has been identified as a potential threat.  If you believe that this is an error, and wish to be allowed access, please contact the site administrator.</p>'));
+    $settings->setBotnetMessage(variable_get('ipvenger_botnet_msg', '<h1>Forbidden</h1><p>Your access to this website has been blocked because the computer you are using appears to have been hijacked by malicious software.  Please update your antivirus and antimalware software and contact the site administrator to request access if the problem persists.</p>'));
+
+    $query = db_query('SELECT mask FROM {ipvenger_exception} WHERE exceptionType = :type AND action = :action',
+      array(':type' => 'ip', ':action' => 'allow'));
+    $result = $query->fetchCol();
+    $settings->setIpAddressWhitelist($result);
+    $query = db_query('SELECT mask FROM {ipvenger_exception} WHERE exceptionType = :type AND action = :action',
+      array(':type' => 'ip', ':action' => 'deny'));
+    $result = $query->fetchCol();
+    $settings->setIpAddressBlacklist($result);
+    $query = db_query('SELECT mask FROM {ipvenger_exception} WHERE exceptionType = :type AND action = :action',
+      array(':type' => 'country', ':action' => 'deny'));
+    $result = $query->fetchCol();
+    $settings->setCountryBlacklist($result);
+
+    // Site specific settings.
+    if (!$logo = theme_get_setting('logo_path')) {
+      $logo = theme_get_setting('logo');
+    }
+    if (!empty($logo)) {
+      $logo = drupal_substr($logo, drupal_strlen($base_url));
+      $settings->setSiteLogo($logo);
+    }
+    if (!$favicon = theme_get_setting('default_favicon')) {
+      $favicon = theme_get_setting('favicon_path');
+    }
+    if (!empty($favicon)) {
+      $favicon = drupal_substr($favicon, drupal_strlen($base_url));
+      $settings->setSiteFavicon($favicon);
+    }
+    if ($name = variable_get('site_name', '')) {
+      $settings->setSiteName($name);
+    }
+    if ($description = variable_get('site_slogan', '')) {
+      $settings->setSiteDescription($description);
+    }
+    if ($library = libraries_get_path('ipvenger')) {
+      $settings->setStylesheet(base_path() . $library . '/css/block_page_style.css');
+    }
+  }
+
+  return $settings;
+}
+
+/**
+ * Helper function to only block certain paths.
+ *
+ * @param IPVengerSettings $settings
+ *   IPVengerSettings site settings.
+ */
+function _ipvenger_allowed_paths(IPVengerSettings $settings) {
+  $return = TRUE;
+
+  $path = base_path() . $_GET['q'];
+  // Don't block the block stylesheet.
+  if ($path == $settings->getStylesheet()) {
+    $return = FALSE;
+  }
+  // Don't block the site logo.
+  elseif ($path == $settings->getSiteLogo()) {
+    $return = FALSE;
+  }
+  // Don't block the favicon.ico.
+  elseif ($path == $settings->getSiteFavicon()) {
+    $return = FALSE;
+  }
+  // Don't block the block page.
+  elseif ($path == base_path() . 'ipvenger/pages/block') {
+    $return = FALSE;
+  }
+  // Don't block the captcha.
+  elseif ($path == base_path() . 'ipvenger/pages/captcha') {
+    $return = FALSE;
+  }
+
+  return $return;
+}

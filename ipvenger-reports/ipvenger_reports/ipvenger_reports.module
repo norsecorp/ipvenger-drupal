@@ -1,0 +1,65 @@
+<?php
+/**
+ * @file
+ * Implements IPVenger Reporting in Drupal.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function ipvenger_reports_menu() {
+  $items['admin/reports/ipvenger/analytics'] = array(
+    'title' => 'IPVenger Analytics',
+    'description' => 'Reports for IPVenger.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ipvenger_reports'),
+    'access arguments' => array('view ipvenger reports'),
+    'file' => 'ipvenger_reports.admin.inc',
+  );
+  $items['admin/ipvenger/recent-blocks'] = array(
+    'title' => 'Recent IPs Blocked',
+    'description' => 'Recent IPs Blocked.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ipvenger_reports_recent_ip_blocks', 3),
+    'access arguments' => array('view ipvenger reports'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ipvenger_reports.admin.inc',
+  );
+  $items['admin/ipvenger/country-details'] = array(
+    'title' => 'Country Details',
+    'description' => 'Dialog pop-up for country details.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ipvenger_reports_country_details', 3, 4),
+    'access arguments' => array('view ipvenger reports'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ipvenger_reports.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function ipvenger_reports_permission() {
+  return array(
+    'view ipvenger reports' => array(
+      'title' => t('View IPVenger Analytics'),
+      'description' => t('Allow users to view IPVenger analytics.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ *
+ * Override the default implementation from flot.module to fix several problems.
+ */
+function ipvenger_reports_theme_registry_alter(&$theme_registry) {
+  if (isset($theme_registry['flot_graph'])) {
+    $path = drupal_get_path('module', 'ipvenger_reports');
+    $theme_registry['flot_graph']['includes'][] = $path . '/ipvenger_reports.theme.inc';
+    $theme_registry['flot_graph']['function'] = 'theme_ipvenger_reports_flot_graph';
+    unset($theme_registry['flot_graph']['preprocess functions']);
+  }
+}

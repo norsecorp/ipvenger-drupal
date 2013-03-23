@@ -1,0 +1,8 @@
+name = IPVenger Reports
+description = View IPVenger reports
+package = Security
+core = 7.x
+
+dependencies[] = ipvenger
+dependencies[] = jvectormap
+dependencies[] = flot

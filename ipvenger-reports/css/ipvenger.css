@@ -1,0 +1,75 @@
+/**
+ * @file
+ * CSS styles for IPVenger admin pages
+ */
+#edit-ip-address-wrapper {
+  border: 0;
+  padding: .5em 0;
+}
+fieldset.ipvenger {
+  border: 0;
+  padding: 0 0 10px 0;
+  position: relative;
+  margin: 0;
+}
+div.ipvenger-left {
+  float: left;
+  clear: both;
+  margin: 0 5px 5px
+}
+div.ipvenger-right {
+  float: left;
+  margin: 5px;
+}
+.ipvenger-clear {
+  clear:both;
+}
+#ip-address-lookup-description-footer {
+  width: 45%;
+}
+#edit-table-filter >div{
+  float:left;
+}
+#edit-country,
+#edit-disposition,
+#edit-category-filter {
+  width: 100px;
+}
+input, label {
+  display:block;
+}
+#ipvenger-table-filter-by,
+#edit-appeal {
+  margin: 30px 10px 0 0;
+}
+#edit-table-filter .form-item {
+  margin: 0 10px 0 0;
+}
+#edit-submit{
+  position: relative;
+  top: 25px;
+}
+.ipvenger-ip-address {
+  font-weight: bold;
+  cursor: pointer;
+  float: left;
+}
+.ipvenger-ip-address:hover {
+  text-decoration: underline;
+}
+/* SECURITY SETTINGS */
+#edit-analytics-ipvenger-site-function-wrapper {
+	width: 400px !important;
+	background-color: pink;
+}
+#edit-analytics-ipvenger-site-function-wrapper .form-item-ipvenger-site-function {
+	width: 200px;
+	float: left;
+}
+#ipvenger-risk-threshold {
+	float: left;
+	width: 200px;
+}
+#frame-header {
+	font-weight: bold;
+}

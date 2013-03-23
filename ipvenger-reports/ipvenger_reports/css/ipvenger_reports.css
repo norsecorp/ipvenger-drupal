@@ -1,0 +1,399 @@
+/**
+ * @file
+ * CSS styles for IPVenger Reports admin pages
+ */
+#ipvenger-analytics-wrapper {
+  width: 762px;
+  float:left;
+}
+div.form-item-date-range {
+  font-size: 115%;
+  font-weight: bold;
+}
+#edit-date-range {
+  float: left;
+  margin-right: 10px;
+}
+div.graph-title {
+  height: 20px;
+  font-size: 18px;
+  color: #777777;
+  font-weight: bold;
+  padding: 9px 0;
+  margin: 0 0 10px;
+}
+.graph-title .emphasis {
+  color: #000;
+}
+#edit-analytics-wrapper {
+  float: left;
+  width: 400px;
+  position: relative;
+  top: 19px;
+  left: 9px;
+  padding: 0px 10px 15px 15px;
+}
+
+/* BLOCKS OVERVIEW */
+/* DISPOSITION GRAPH */
+#ipvenger-reports-category-pie {
+  float: left;
+}
+#edit-summary {
+  background-image: url(../images/ipvenger-reports-disposition-pie-bg.png);
+  background-repeat: no-repeat no-repeat;
+  height: 393px;
+  width: 762px;
+}
+#edit-disposition-wrapper {
+  float: left;
+  width: 435px;
+}
+#ipvenger-reports-disposition-pie {
+  float: left;
+  margin: 20px 0 0 24px;
+}
+/* DISPOSITION GRAPH LEGEND STYLES */
+#edit-disposition-graph-legend-wrapper {
+  float: left;
+  width: 160px;
+  margin: 50px 0 0 18px;
+  text-shadow: 0 1px #FFF;
+  padding: 9px 0;
+}
+#edit-reason-text {
+  padding: 20px 20px 0;
+  font-size: 85%;
+  line-height: 1.5;
+}
+#edit-category-reason-text {
+  clear: both;
+  position: relative;
+  top: 0;
+  font-size: 85%;
+  margin-left: 10px;
+  padding-right: 20px;
+  line-height: 1.5;
+}
+#ipvenger-reports-legend-visits {
+  color: #999;
+  font-size: 140%;
+  margin-bottom: 16px;
+  white-space: nowrap;
+}
+.disposition-legend-count {
+  font-size: 12px;
+}
+#edit-legend-ipq, #edit-legend-country, #edit-legend-ip, #edit-legend-accept div{
+  margin-bottom: 10px;
+  text-shadow: none;
+}
+div.disposition-legend-count {
+  font-size: 115%;
+  font-weight: bold;
+  line-height: 1;
+}
+div.legend-ipq div {
+  color: white;
+}
+div.legend-country div {
+  color: #F6821F;
+}
+div.legend-ip div {
+  color: #999;
+}
+div.legend-allowed div {
+  color: #00ADDE;
+}
+#edit-category {
+  float: left;
+  width: 314px;
+  margin: 90px 0 0 13px;
+}
+#edit-category-graph-legend-wrapper {
+  float: left;
+  margin: -30px 0 0 18px;
+  text-shadow: 0 1px #FFF;
+  padding: 9px 0;
+}
+#edit-category-graph-legend {
+  font-size: 12px;
+  margin-top: 10px;
+  line-height: 1.2;
+}
+#category-pie-legend, #category-pie-legend td {
+  border-spacing: 0;
+  border: 0;
+  padding: 0;
+}
+#category-pie-legend, #category-pie-legend td.legend-label{
+  padding-bottom: 7px;
+}
+#category-pie-legend {
+  font-size: 90%;
+  color: #545454;
+  padding-bottom: 7px;
+  border-spacing: 0;
+  border: 0;
+  padding: 0;
+}
+#category-pie-legend table, #category-pie-legend table td {
+  border-spacing: 0;
+  border: 0;
+  padding: 0;
+}
+#category-pie-legend table, #category-pie-legend table td.legend-label {
+  padding-bottom: 7px;
+}
+#category-pie-legend-title {
+  font-size: 125%;
+  font-weight: bold;
+  color: #CC0000;
+}
+.category-legend-count {
+  font-weight: bold;
+}
+/* DAILY BLOCKS BY TYPE */
+#edit-daily-graph {
+  margin-left: 10px;
+}
+#edit-daily-graph-title {
+  font-size: 125%;
+  margin: 10px 0 15px;
+}
+#ipvenger-reports-daily-risk {
+  float:left;
+}
+#edit-daily-graph-wrapper {
+  width: 722px;
+  position: absolute;
+  left: 40px;
+}
+#edit-daily-y-label {
+  float: left;
+  -o-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  margin: 77px 0 0 -40px;
+  height: 20px;
+}
+#ipvenger-reports-daily-risk-legend {
+  clear: both;
+  width: 748px;
+}
+#edit-daily-graph {
+  height: 355px;
+  clear: both;
+}
+#edit-daily-graph-legend {
+  clear: left;
+  margin-top: 10px;
+  padding: 9px 0;
+  margin: 0 0 10px;
+}
+div.daily-legend-ipq {
+  background: #CC1A00;
+}
+div.daily-legend-country {
+  background: #F6821F;
+}
+div.daily-legend-ip {
+  background: #999999;
+}
+.legend-color {
+  float: left;
+  width: 12px;
+  height: 8px;
+  padding: 1px;
+  margin: 5px 0 0 20px;
+}
+.legend-color-inner {
+  height: 8px;
+}
+#edit-daily-graph-legend label {
+  float: left;
+  font-weight: normal;
+  font-size: 80%;
+  padding-left: 8px;
+}
+#edit-daily-link-container {
+  text-align: center;
+  margin: 25px 0 20px;
+}
+
+/* BLOCKS BY COUNTRY */
+#edit-country-graph-container-average-score {
+  margin-bottom: 40px;
+}
+#ipvenger-reports-country-graph-percentage .xAxis .tickLabel, #ipvenger-reports-country-graph-percentage .x1Axis .tickLabel {
+  -o-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  text-align: right !important;
+  margin: 32px 0 0 -32px;
+  line-height: 11px;
+}
+#ipvenger-reports-country-graph-average-score .xAxis .tickLabel, #ipvenger-reports-country-graph-average-score .x1Axis .tickLabel {
+  -o-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  text-align: right !important;
+  margin: 32px 0 0 -32px;
+  line-height: 11px;
+}
+#edit-country-graph-container {
+  padding: 0 0 10px 10px;
+}
+#edit-country-sort-container {
+  padding: 0;
+  margin-bottom: 12px;
+}
+#ipvenger-country-sort-block {
+  font-weight:bold;
+  color:#F79622;
+}
+#ipvenger-country-sort-ipq {
+  color: #CC1A00;
+}
+#edit-country-sort-container span:hover {
+  cursor: pointer;
+}
+#edit-country-graph-title {
+  font-size: 125%;
+  background-color: #EFEFEF;
+  padding: 5px 10px;
+  height: 22px;
+  margin-top: 20px;
+}
+#ipvenger-country-sort-block {
+  display: inline-block;
+  width: 146px;
+  text-align: center;
+}
+#edit-country-filter-container {
+  font-size: 125%;
+  background-color: #EFEFEF;
+  padding: 5px 10px;
+  width: 752px;
+  height: 22px;
+  margin-top: 20px;
+}
+#edit-country-table {
+  font-size: 125%;
+  background-color: #EFEFEF;
+  padding: 5px 10px;
+  height: 22px;
+  margin-top: 20px;
+}
+#edit-country-table .form-item-country {
+	margin: 0 0 20px;
+	padding: 0;
+}
+
+#edit-country-table .form-item-country label {
+  float: left;
+  margin-right: 10px;
+}
+td.ipvenger-country-name a {
+  font-weight: bold;
+}
+#country-detail-table {
+	width: 760px;
+	position: relative;
+	left: -10px;
+}
+#country-detail-table table {
+	font-size: 13px;
+	border-color: #DEDEDE;
+}
+#country-detail-table table tr.even, #country-detail-table table tr.odd {
+	border-color: #DEDEDE;
+}
+#country-detail-table table tr td:last-child {
+	border-color: #DEDEDE;
+}
+#country-detail-table table th {
+	border-color: #FFF;
+	padding: 7px 4px;
+}
+#country-detail-table table thead {
+	font-size: 10px;
+	padding: 10px 0;
+	border-top: 1px solid #DEDEDE;
+	border-left: 1px solid #DEDEDE;
+	border-right: 1px solid #DEDEDE;
+}
+.pager {
+	font-size: 13px;
+}
+
+/* IP TICKER */
+#edit-ip-ticker {
+  float: left;
+  width: 214px;
+  height: 1564px;
+  margin-left: 20px;
+}
+#edit-ip-ticker label {
+  font-size: 115%;
+  padding: 5px 0 8px 12px;
+  font-weight: bold;
+  color: #FFF;
+  background-color: #00AEEF;
+}
+#ipvenger-reports-recent-blocked .ticker-row {
+  background-color: #EFEFEF;
+  padding: 12px;
+  border-bottom: 1px solid #FFF;
+  line-height: 1.5;
+  font-size: 14px;
+  -moz-box-shadow: inset 5px 0px 7px -3px rgba(0, 0, 0, .1);
+  -webkit-box-shadow: inset 5px 0px 7px -3px rgba(0, 0, 0, .1);
+  box-shadow: inset 5px 0px 7px -3px rgba(0, 0, 0, .1);
+}
+.date {
+  font-size: 12px;
+  color: #999;
+  float: right;
+}
+.reason {
+  color: #00AEEF;
+  clear: left;
+}
+a.ticker-bookends {
+  font-size: 115%;
+  padding: 5px 0 8px 12px;
+  font-weight: bold;
+  color: #FFF;
+  background-color: #00AEEF;
+  display: block;
+  text-decoration: underline;
+}
+
+div.detail-legend-low {
+  background-color: #00A6E4;
+}
+div.detail-legend-medium {
+  background-color: #EA7C1E;
+}
+div.detail-legend-high {
+  background-color: #B81600;
+}
+div.detail-legend-critical {
+  background-color: #5C0700;
+}
+#edit-country-detail-legend-wrapper {
+  clear: left;
+  margin-top: 10px;
+  padding: 9px 0;
+  margin: 0 0 10px;
+}
+#edit-country-detail-legend-wrapper label {
+  float: left;
+  font-weight: normal;
+  font-size: 80%;
+  padding-left: 8px;
+}

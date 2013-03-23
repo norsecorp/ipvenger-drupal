@@ -1,0 +1,8 @@
+name = IPVenger
+description = Protect sites from hackers, spammers, and malware.
+package = Security
+core = 7.x
+
+dependencies[] = libraries (>=2.x)
+
+configure = admin/config/security/ipvenger

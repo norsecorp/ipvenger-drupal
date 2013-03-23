@@ -1,0 +1,47 @@
+Installation steps:
+
+Required Steps:
+
+Install Libraries module:
+1. Go to Modules and click the "Install new module" link. 
+2. Enter the following URL: http://ftp.drupal.org/files/projects/libraries-7.x-2.1.tar.gz
+3. Upon successful installation, click "Enable newly added modules"
+4. Find "Libraries" in list of modules, click the checkbox and pres the "save" button to enable the module.
+
+Install the IPVenger Library: 
+5. Unzip the ipvenger_library.zip file
+6. Upload the file to sites/all/libraries. 
+
+Install the SecurImage library:
+7. Download the securimage library from http://www.phpcaptcha.org/download/
+8. Expand zip file and rename directory to securimage.
+9. Upload the file to sites/all/libraries.
+
+Install the IPVenger Module:
+10. Go to modules and click "Install the new module" link.
+11. Upload the ipvenger.zip module zip file
+12. Upon successful installation, click "Enable newly added modules".
+13. Find IPVenger in the list of modules, click the checkbox and press the "save" button to enable the module.
+14. Go to Configuration -> Security -> Ipvenger, and enter API key
+
+Optional Steps for reports:
+
+Install JVectorMap Module/Library
+15. Go to Modules and click the "Install new module" link
+16. Enter the following URL: http://ftp.drupal.org/files/projects/jvectormap-7.x-1.0-beta1.tar.gz
+17. Upon successful installation, click "Enable newly added modules"
+18. Find "JVectorMap" in the list of modules, click the checkbox and press the "save" button to enable the module.
+19. Download the JVectorMap library from http://jvectormap.com/download/ 
+20. Expand zip file and rename directory to jvectormap
+21. Rename jquery-jvectormap-1.2.2.css to jquery.jvectormap.css (note that dash should be changed to a dot)
+22. Rename jquery-jvectormap-1.2.2.min.js to jquery.jvectormap.min.js (note that dash should be changed to a dot)
+
+Install Flot Module
+23. Go to Modles and click the "Install new module" link
+24. Enter the following URL: http://ftp.drupal.org/files/projects/flot-7.x-1.0.tar.gz
+25. Upon successful installation, click "Enable newly added modules"
+26. Find "Flot" in list of modules, click the checkbox and pres the "save" button to enable the module.
+27. Download the Flot library from http://www.flotcharts.org/
+20. Expand zip file and rename directory to flot
+29. Go to Modules and click the checkbox next to "IPVenger Reports", then click "save".
+

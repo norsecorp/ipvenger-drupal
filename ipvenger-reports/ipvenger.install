@@ -1,0 +1,375 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the IP Venger module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function ipvenger_schema() {
+  $schema = array();
+
+  $schema['cache_ipvenger'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_ipvenger']['description'] = 'Cache table used to store temporary ipvenger records.';
+
+  $schema['ipvenger_request_detail'] = array(
+    'description' => 'IPVenger detail reporting table - raw dump of all IPViking risk data.',
+    'fields' => array(
+      'ipAddress' => array(
+        'description' => 'IP submitted to IPViking.',
+        'type' => 'varchar',
+        'length' => '16',
+        'not null' => FALSE,
+      ),
+      'riskFactor' => array(
+        'description' => 'IPQ Score.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'riskColor' => array(
+        'description' => 'Color associated with a IPViking-defined scale of risk. Possible values are green, yellow, orange, red.',
+        'type' => 'varchar',
+        'length' => '16',
+        'not null' => FALSE,
+      ),
+      'riskName' => array(
+        'description' => 'IPViking-defined general category of risk. Possible values are Low, Medium, High.',
+        'type' => 'varchar',
+        'length' => '16',
+        'not null' => FALSE,
+      ),
+      'riskDescription' => array(
+        'description' => 'IPViking-defined general category of risk. Possible values are Low, Medium, High.',
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => FALSE,
+      ),
+      'timestamp' => array(
+        'description' => 'The UNIX timestamp of the request.',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'autonomousSystemNumber' => array(
+        'description' => 'Autonomous system number for the IP address.',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'autonomousSystemName' => array(
+        'description' => 'Autonomous system name for the IP address.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => FALSE,
+      ),
+      'country' => array(
+        'description' => 'Country name.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => FALSE,
+      ),
+      'countryCode' => array(
+        'description' => 'Country code per the ISO Standard.',
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => FALSE,
+      ),
+      'region' => array(
+        'description' => 'The state or region name.',
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => FALSE,
+      ),
+      'regionCode' => array(
+        'description' => 'The Region/Province/Territory code per the ISO Standard.',
+        'type' => 'varchar',
+        'length' => '32',
+        'not null' => FALSE,
+      ),
+      'city' => array(
+        'description' => 'City name.',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => FALSE,
+      ),
+      'latitude' => array(
+        'description' => 'Latitude of the provide IP address.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'longitude' => array(
+        'description' => 'Longitude of the provide IP address.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'internetServiceProvider' => array(
+        'description' => 'The organization associated with the provided IP.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => FALSE,
+      ),
+      'organization' => array(
+        'description' => 'The organization associated with the provided IP.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => FALSE,
+      ),
+      'countryRiskFactor' => array(
+        'description' => 'Statistical analysis reflecting the country risk factor assessment.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'regionRiskFactor' => array(
+        'description' => 'Statistical analysis reflecting the region risk factor assessment.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'ipResolveFactor' => array(
+        'description' => 'Factor assessment of the historical and current DNS reverse for the submitted IP.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'asnRecordFactor' => array(
+        'description' => 'Factor assessment based on the presence of AS (Autonomous system) the IP is assigned.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'asnThreatFactor' => array(
+        'description' => 'Statistical analysis on historical and current incidents resolved to AS Numbers assessment.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'bgpDelegationFactor' => array(
+        'description' => 'BGP delegation records historical and current, assessment of multiple characteristics.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'ianaAllocationFactor' => array(
+        'description' => 'Assessment based on IANA allocation records for the IP submitted historical and current.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'personalFactor' => array(
+        'description' => 'Statistical analysis from various desktop agents and software database warehouses of user submitted data.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'categoryFactor' => array(
+        'description' => 'Contextual statistical analysis using statistical inference towards actual collected internet intelligence.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'geofilterFactor' => array(
+        'description' => 'Factor derived from the user manipulated GeoFiltering system.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'geofilterRule' => array(
+        'description' => 'Rule ID from user submitted rules used to derived the factor.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'dataAgeFactor' => array(
+        'description' => 'Factor assessment derived from the factors timestamps used in the entire risk assessment.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'searchVolumeFactor' => array(
+        'description' => 'Factor assessment based on the frequenzy and volume the current IP is searched.',
+        'type' => 'float',
+        'not null' => FALSE,
+      ),
+      'categoryName' => array(
+        'description' => 'General behavior type for the submitted IP.',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => FALSE,
+      ),
+      'categoryId' => array(
+        'description' => 'Specific categorization ID of the behavior category.',
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => FALSE,
+      ),
+      'factorName' => array(
+        'description' => 'Highest contributing risk factor name.',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => FALSE,
+      ),
+      'disposition' => array(
+        'description' => 'The disposition of the request for future analysis. Requests are assigned one of two dispositions: FALSE (0) is a blocked request and TRUE (1) is an allowed request.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => FALSE,
+      ),
+      'dispositionReason' => array(
+        'description' => 'The disposition reason of the request for future analysis. Blocked requests are always assigned one of three disposition reasons: IPQ Score, IP Blacklist or Country Blacklist.',
+        'type' => 'varchar',
+        'length' => '40',
+        'not null' => FALSE,
+      ),
+    ),
+  );
+
+  $schema['ipvenger_appeal'] = array(
+    'description' => 'IPVenger user appeals.',
+    'fields' => array(
+      'appealId' => array(
+        'description' => 'Primary Key: Unique appeal ID.',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'timestamp' => array(
+        'description' => 'The UNIX timestamp of the date/time the appeal occurred.',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'ipAddress' => array(
+        'description' => 'IP address from the appeal',
+        'type' => 'varchar',
+        'length' => '16',
+        'not null' => FALSE,
+      ),
+      'email' => array(
+        'description' => 'Email address from the appeal',
+        'type' => 'varchar',
+        'length' => '128',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array(
+      'appealId',
+    ),
+  );
+
+  $schema['ipvenger_exception'] = array(
+    'description' => 'Blacklist or whitelist exception list.',
+    'fields' => array(
+      'action' => array(
+        'description' => 'Exception of blacklist or whitelist - allowed values are "allow" or "deny".',
+        'type' => 'varchar',
+        'length' => '60',
+        'not null' => FALSE,
+      ),
+      'mask' => array(
+        'description' => 'IP address or country mask against which to test candidates.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+      ),
+      'maskType' => array(
+        'description' => 'IP address exception type of "exact", "wildcard" or "ip_range".',
+        'type' => 'varchar',
+        'length' => '60',
+        'not null' => FALSE,
+      ),
+      'exceptionType' => array(
+        'description' => 'Exception type of "ip", "country", etc.',
+        'type' => 'varchar',
+        'length' => '55',
+        'not null' => FALSE,
+      ),
+    ),
+    'unique keys' => array(
+      'mask' => array(
+        'mask',
+        'exceptionType',
+      ),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ipvenger_uninstall() {
+  // Remove the settings variables.
+  variable_del('ipvenger_appeal_allow');
+  variable_del('ipvenger_apikey');
+  variable_del('ipvenger_apikey_valid');
+  variable_del('ipvenger_botnet_msg');
+  variable_del('ipvenger_general_msg');
+  variable_del('ipvenger_proxy_msg');
+  variable_del('ipvenger_risk_threshold');
+  variable_del('ipvenger_site_function');
+  variable_del('ipvenger_appeal_email');
+}
+
+/**
+ * Implements hook_requirements().
+ *
+ * Checks the version of IPVenger dependencies on install and
+ * issues an error if there is a problem.
+ */
+function ipvenger_requirements($phase) {
+  $requirements = array();
+
+  // Ensure translations do not break at install time.
+  $t = get_t();
+
+  if ($phase == 'runtime') {
+
+    // Default requirement title.
+    $title = $t('IPVenger Library');
+
+    if (!variable_get('ipvenger_apikey_valid', FALSE)) {
+      $requirements['ipvenger_api_key']['title'] = $title . ': ' . $t('API key not validated.');
+      $requirements['ipvenger_api_key']['value'] = $t('Current key: ') . variable_get('ipvenger_apikey', $t('(empty)'));
+      $requirements['ipvenger_api_key']['description'] = $t('Please provide a valid API key.');
+      $requirements['ipvenger_api_key']['severity'] = REQUIREMENT_ERROR;
+    }
+
+    $library = libraries_detect('ipvenger');
+
+    // Success!  We found the library.
+    if ($library['installed']) {
+      $requirements['ipvenger']['title'] = $title;
+      $requirements['ipvenger']['value'] = $library['version'];
+      $requirements['ipvenger']['description'] = $t('Installed version');
+      $requirements['ipvenger']['severity'] = REQUIREMENT_OK;
+    }
+    // Not installed or unsupported version installed.
+    else {
+      $supported_versions = array_keys($library['versions']);
+      $error = $library['error message'] . ' ' . $t('Please download a supported version (%versions) from %url.',
+        array(
+          '%versions' => implode(' or ', $supported_versions),
+          '%url' => $library['download url'],
+        ));
+      $requirements['ipvenger']['title'] = $title;
+      $requirements['ipvenger']['value'] = isset($library['version']) ? $library['version'] : '';
+      $requirements['ipvenger']['description'] = $error;
+      $requirements['ipvenger']['severity'] = REQUIREMENT_ERROR;
+    }
+
+    // Default requirement title.
+    $title = $t('Securimage');
+
+    $library = libraries_detect('securimage');
+
+    // Success!  We found the library.
+    if ($library['installed']) {
+      $requirements['securimage']['title'] = $title;
+      $requirements['securimage']['value'] = $library['version'];
+      $requirements['securimage']['description'] = $t('Installed version');
+      $requirements['securimage']['severity'] = REQUIREMENT_OK;
+    }
+    // Not installed or unsupported version installed.
+    else {
+      $supported_versions = array_keys($library['versions']);
+      $error = $library['error message'] . ' ' . $t('Please download a supported version (%versions) from %url.',
+        array(
+          '%versions' => implode(' or ', $supported_versions),
+          '%url' => $library['download url'],
+        ));
+      $requirements['securimage']['title'] = $title;
+      $requirements['securimage']['value'] = isset($library['version']) ? $library['version'] : '';
+      $requirements['securimage']['description'] = $error;
+      $requirements['securimage']['severity'] = REQUIREMENT_ERROR;
+    }
+  }
+
+  return $requirements;
+}
